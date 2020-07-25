@@ -6,7 +6,9 @@
 
 Universal compose `middleware` returning a fully valid middleware comprised of all those which are passed.
 
-This is a TypeScript port of koa-compose [koajs/koa-compose](https://github.com/koajs/compose) with just added optional previous middleware value passing similar to act as a 'pipe' because as a composition utility, there are use cases beyond koa middleware. 
+As a composition utility, there are use cases beyond koa middleware [koajs/koa-compose](https://github.com/koajs/compose).
+
+This is a TypeScript port of koa-compose with added optional passing of previous middleware value into next()
 
 ## Installation
 
