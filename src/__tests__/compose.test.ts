@@ -7,8 +7,8 @@ const isPromise = (x: any) => {
 describe('compose', () => {
     const delay = () => new Promise((resolve) => setTimeout(resolve, 1));
     it('should work', () => {
-        let arr: number[] = [];
-        let stack: Middleware[] = [];
+        const arr: number[] = [];
+        const stack: Middleware[] = [];
 
         stack.push(async (context, next) => {
             arr.push(1);
@@ -40,7 +40,7 @@ describe('compose', () => {
     });
 
     it('should be able to be called twice', () => {
-        let stack: Middleware[] = [];
+        const stack: Middleware[] = [];
 
         stack.push(async (context, next) => {
             context.arr.push(1);
@@ -71,10 +71,10 @@ describe('compose', () => {
         const ctx2 = { arr: [] };
         const out = [1, 2, 3, 4, 5, 6];
 
-        return fn(ctx1, async () => {})
+        return fn(ctx1, async () => null)
             .then(() => {
                 expect(out).toEqual(ctx1.arr);
-                return fn(ctx2, async () => {});
+                return fn(ctx2, async () => null);
             })
             .then(() => {
                 expect(out).toEqual(ctx2.arr);
@@ -102,7 +102,7 @@ describe('compose', () => {
 
         compose(stack as Middleware[])({});
 
-        for (let next of arr) {
+        for (const next of arr) {
             expect(isPromise(next)).toBeTruthy();
         }
     });
@@ -120,7 +120,7 @@ describe('compose', () => {
     });
 
     it('should work when yielding at the end of the stack', () => {
-        let stack: Middleware[] = [];
+        const stack: Middleware[] = [];
         let called = false;
 
         stack.push(async (ctx, next) => {
@@ -134,7 +134,7 @@ describe('compose', () => {
     });
 
     it('should reject on errors in middleware', () => {
-        let stack: Middleware[] = [];
+        const stack: Middleware[] = [];
 
         stack.push(() => {
             throw new Error('expected');
@@ -151,7 +151,7 @@ describe('compose', () => {
     });
 
     it('should work when yielding at the end of the stack with yield*', () => {
-        let stack: Middleware[] = [];
+        const stack: Middleware[] = [];
 
         stack.push(async (ctx, next) => {
             await next;
@@ -161,9 +161,9 @@ describe('compose', () => {
     });
 
     it('should keep the context', () => {
-        let ctx = {};
+        const ctx = {};
 
-        let stack: Middleware[] = [];
+        const stack: Middleware[] = [];
 
         stack.push(async (ctx2, next) => {
             await next();
@@ -184,8 +184,8 @@ describe('compose', () => {
     });
 
     it('should catch downstream errors', () => {
-        let arr: number[] = [];
-        let stack: Middleware[] = [];
+        const arr: number[] = [];
+        const stack: Middleware[] = [];
 
         stack.push(async (ctx, next) => {
             arr.push(1);
@@ -221,7 +221,7 @@ describe('compose', () => {
     });
 
     it('should handle errors in wrapped non-async functions', () => {
-        let stack: Middleware[] = [];
+        const stack: Middleware[] = [];
 
         stack.push(() => {
             throw new Error('expected');
@@ -239,7 +239,7 @@ describe('compose', () => {
 
     // https://github.com/koajs/compose/pull/27#issuecomment-143109739
     it('should compose w/ other compositions', () => {
-        let called: number[] = [];
+        const called: number[] = [];
 
         return compose([
             compose([
@@ -298,20 +298,20 @@ describe('compose', () => {
     });
 
     it('should return last return value', () => {
-        let stack: Middleware[] = [];
+        const stack: Middleware[] = [];
 
         stack.push(async (context, next) => {
-            let val = await next();
+            const val = await next();
             expect(val).toEqual(2);
             return 1;
         });
 
         stack.push(async (context, next) => {
-            let val = await next();
+            const val = await next();
             expect(val).toEqual(0);
             return 2;
         });
-        let next: NextFunction = async () => 0;
+        const next: NextFunction = async () => 0;
         return compose(stack)({}, next).then(function (val) {
             expect(val).toEqual(1);
         });
