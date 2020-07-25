@@ -61,3 +61,10 @@ const context: MyContext = {
 const result = await compose([logRunningTime, print, transform, fetch])(context)
 
 ```
+
+[npm-image]: https://img.shields.io/npm/v/flow-compose.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/ctx-compose
+[license-image]: http://img.shields.io/npm/l/flow-compose.svg?style=flat-square
+[license-url]: LICENSE
+[downloads-image]: http://img.shields.io/npm/dm/flow-compose.svg?style=flat-square
+[downloads-url]: https://npmjs.org/package/flow-compose
