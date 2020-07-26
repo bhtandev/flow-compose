@@ -371,3 +371,55 @@ describe('compose', () => {
         expect(res).toEqual('passed');
     });
 });
+
+
+
+it('Example', async () => {
+    type MyContext = {
+        logger: { log: (...args: any[]) => void };
+        service: { get: () => Promise<string> };
+    };
+    const loggerMock = jest.fn()
+
+    async function handleError(context: MyContext, next: NextFunction) {
+        try {
+            return next();
+        } catch (err) {
+            // handle error
+            return null;
+        }
+    }
+
+    async function logRunningTime(context: MyContext, next: NextFunction) {
+        const start = Date.now();
+        const text = await next();
+        const end = Date.now();
+
+        context.logger.log('Total time:', end - start);
+
+        return text;
+    }
+
+    async function print(context: MyContext, next: NextFunction, valueFromPrev: any) {
+        return next(valueFromPrev);
+    }
+
+    async function transform(context: MyContext, next: NextFunction, valueFromPrev: any) {
+        return valueFromPrev.toUpperCase();
+    }
+
+    async function fetch(context: MyContext, next: NextFunction) {
+        const rawData = await context.service.get();
+
+        return next(rawData);
+    }
+
+    const context: MyContext = {
+        logger: { log: loggerMock },
+        service: { get: async () => 'data' },
+    };
+
+    const result = await compose([handleError, logRunningTime, fetch, print, transform])(context);
+    expect(result).toEqual('DATA');
+    expect(loggerMock).toBeCalledTimes(1);
+});

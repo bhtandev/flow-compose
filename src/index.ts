@@ -1,4 +1,4 @@
-type NextFunction = (previousResult?: any) => Promise<any>;
+type NextFunction = (previousResult?: any) => Promise<any> | any;
 
 type Middleware<T = any> = (context: T, next: NextFunction, PreviousResult?: any) => Promise<any>;
 
