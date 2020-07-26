@@ -23,7 +23,10 @@
   "keywords": [
     "middleware",
     "compose",
-    "flow"
+    "flow",
+    "async",
+    "pipe",
+    "typescript"
   ],
   "author": "Boon Hui Tan",
   "license": "ISC",

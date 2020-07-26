@@ -372,14 +372,12 @@ describe('compose', () => {
     });
 });
 
-
-
 it('Example', async () => {
     type MyContext = {
         logger: { log: (...args: any[]) => void };
         service: { get: () => Promise<string> };
     };
-    const loggerMock = jest.fn()
+    const loggerMock = jest.fn();
 
     async function handleError(context: MyContext, next: NextFunction) {
         try {

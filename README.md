@@ -9,12 +9,12 @@ comprised of all those which are passed.
 
 The idea of middleware is to create small handlers that each perform a specific task and pass the result to the next step in a chain. 
 
-This pattern has been implemented already in KoaJS for processing HTTP requests and does not have to be limited
-
+This pattern has been implemented already in KoaJS for processing HTTP requests and does not have to be limited 
 to just HTTP request and response cycle but apply to any asynchronous functions.
 
-This is a TypeScript port of [koajs/koa-compose](https://github.com/koajs/compose) 
- - with ability to specify own context type and 
+This is a TypeScript port of [koajs/koa-compose](https://github.com/koajs/compose) with extra
+
+ - ability to specify own context type and 
  - optional passing of a value as parameter from previous middleware into the next
 
 ## Installation
