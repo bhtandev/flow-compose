@@ -56,11 +56,12 @@ async function logRunningTime(context: MyContext, next: NextFunction) {
     return text;
 }
 
-async function print(context: MyContext, next: NextFunction, valueFromPrev: any) {
+async function print(context: MyContext, next: NextFunction, valueFromPrev: string) {
+    context.logger.log('printing', valueFromPrev);
     return next(valueFromPrev);
 }
 
-async function transform(context: MyContext, next: NextFunction, valueFromPrev: any) {
+async function transform(context: MyContext, next: NextFunction, valueFromPrev: string) {
     return valueFromPrev.toUpperCase();
 }
 
@@ -75,7 +76,7 @@ const context: MyContext = {
     service: { get: async () => 'data' },
 };
 
-const result = await compose([handleError, logRunningTime, fetch, print, transform])(context);
+const result = await compose<MyContext>([handleError, logRunningTime, fetch, print, transform])(context);
 ```
 
 [npm-image]: https://img.shields.io/npm/v/flow-compose.svg?style=flat-square

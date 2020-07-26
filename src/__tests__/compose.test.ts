@@ -398,11 +398,12 @@ it('Example', async () => {
         return text;
     }
 
-    async function print(context: MyContext, next: NextFunction, valueFromPrev: any) {
+    async function print(context: MyContext, next: NextFunction, valueFromPrev: string) {
+        context.logger.log('Printing', valueFromPrev);
         return next(valueFromPrev);
     }
 
-    async function transform(context: MyContext, next: NextFunction, valueFromPrev: any) {
+    async function transform(context: MyContext, next: NextFunction, valueFromPrev: string) {
         return valueFromPrev.toUpperCase();
     }
 
@@ -417,7 +418,7 @@ it('Example', async () => {
         service: { get: async () => 'data' },
     };
 
-    const result = await compose([handleError, logRunningTime, fetch, print, transform])(context);
+    const result = await compose<MyContext>([handleError, logRunningTime, fetch, print, transform])(context);
     expect(result).toEqual('DATA');
-    expect(loggerMock).toBeCalledTimes(1);
+    expect(loggerMock).toBeCalledTimes(2);
 });
