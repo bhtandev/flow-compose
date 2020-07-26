@@ -34,7 +34,7 @@ describe('compose', () => {
             arr.push(4);
         });
 
-        return compose(stack)({}).then(() => {
+        return compose(stack)({}, async () => null).then(() => {
             expect(arr).toEqual([1, 2, 3, 4, 5, 6]);
         });
     });
@@ -376,8 +376,10 @@ it('Example', async () => {
     type MyContext = {
         logger: { log: (...args: any[]) => void };
         service: { get: () => Promise<string> };
+        eventSender: { send: (data: string) => void };
     };
     const loggerMock = jest.fn();
+    const eventSenderMock = jest.fn();
 
     async function handleError(context: MyContext, next: NextFunction) {
         try {
@@ -398,8 +400,8 @@ it('Example', async () => {
         return text;
     }
 
-    async function print(context: MyContext, next: NextFunction, valueFromPrev: string) {
-        context.logger.log('Printing', valueFromPrev);
+    async function fireEvent(context: MyContext, next: NextFunction, valueFromPrev: string) {
+        context.eventSender.send(valueFromPrev);
         return next(valueFromPrev);
     }
 
@@ -416,9 +418,13 @@ it('Example', async () => {
     const context: MyContext = {
         logger: { log: loggerMock },
         service: { get: async () => 'data' },
+        eventSender: {
+            send: eventSenderMock,
+        },
     };
 
-    const result = await compose<MyContext>([handleError, logRunningTime, fetch, print, transform])(context);
+    const result = await compose<MyContext>([handleError, logRunningTime, fetch, fireEvent, transform])(context);
     expect(result).toEqual('DATA');
-    expect(loggerMock).toBeCalledTimes(2);
+    expect(loggerMock).toBeCalledTimes(1);
+    expect(eventSenderMock).toBeCalledTimes(1);
 });

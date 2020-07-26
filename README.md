@@ -4,7 +4,7 @@
 [![License][license-image]][license-url]
 [![Downloads][downloads-image]][downloads-url]
 
-Asynchronous flow control utilising a compose `middleware` returning a fully valid middleware 
+Asynchronous flow control utilising a onion-like compose `middleware` returning a fully valid middleware 
 comprised of all those which are passed.
 
 The idea of middleware is to create small handlers that each perform a specific task and pass the result to the next step in a chain. 
@@ -35,6 +35,7 @@ import { compose, NextFunction } from 'flow-compose';
 type MyContext = {
     logger: { log: (...args: any[]) => void };
     service: { get: () => Promise<string> };
+    eventSender: { send: (data: string) => void };
 };
 
 async function handleError(context: MyContext, next: NextFunction) {
@@ -56,8 +57,8 @@ async function logRunningTime(context: MyContext, next: NextFunction) {
     return text;
 }
 
-async function print(context: MyContext, next: NextFunction, valueFromPrev: string) {
-    context.logger.log('printing', valueFromPrev);
+async function fireEvent(context: MyContext, next: NextFunction, valueFromPrev: string) {
+    context.eventSender.send(valueFromPrev);
     return next(valueFromPrev);
 }
 
@@ -74,9 +75,10 @@ async function fetch(context: MyContext, next: NextFunction) {
 const context: MyContext = {
     logger: { log: console.log },
     service: { get: async () => 'data' },
+    eventSender: { send: (data) => {} }
 };
 
-const result = await compose<MyContext>([handleError, logRunningTime, fetch, print, transform])(context);
+const result = await compose<MyContext>([handleError, logRunningTime, fetch, fireEvent, transform])(context);
 ```
 
 [npm-image]: https://img.shields.io/npm/v/flow-compose.svg?style=flat-square
