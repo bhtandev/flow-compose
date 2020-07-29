@@ -1,8 +1,9 @@
 {
   "name": "flow-compose",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "All purpose composer",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
