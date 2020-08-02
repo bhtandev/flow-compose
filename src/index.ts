@@ -54,8 +54,8 @@ const compose = <T = any>(middlewares: Middleware<T>[]) => {
     };
 };
 
-const parallel = <T>(middleware: Middleware[]) => async (context: T, next: NextFunction, prev?: any) => {
-    const result = await Promise.all(middleware.map((m) => m(context, NOOP, prev)));
+const parallel = <T>(middleware: Middleware[]) => async (context: T, next: NextFunction, valueFromPrev?: any) => {
+    const result = await Promise.all(middleware.map((fn) => fn(context, NOOP, valueFromPrev)));
     return next(result);
 };
 

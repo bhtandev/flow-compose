@@ -1,4 +1,4 @@
-import { compose, NextFunction, parallel } from '../index';
+import { compose, Middleware, NextFunction, parallel } from '../index';
 
 describe('Examples', () => {
     it('as middleware', async () => {
@@ -10,16 +10,16 @@ describe('Examples', () => {
         const loggerMock = jest.fn();
         const eventSenderMock = jest.fn();
 
-        async function handleError(context: MyContext, next: NextFunction) {
+        const handleError: Middleware<MyContext> = async (context, next) => {
             try {
                 return await next();
             } catch (err) {
                 // handle error
                 return null;
             }
-        }
+        };
 
-        async function logRunningTime(context: MyContext, next: NextFunction) {
+        const logRunningTime: Middleware<MyContext> = async (context, next) => {
             const start = Date.now();
             const text = await next();
             const end = Date.now();
@@ -27,22 +27,19 @@ describe('Examples', () => {
             context.logger.log('Total time:', end - start);
 
             return text;
-        }
+        };
 
-        async function fireEvent(context: MyContext, next: NextFunction, valueFromPrev: string) {
+        const fireEvent: Middleware<MyContext> = async (context, next, valueFromPrev) => {
             context.eventSender.send(valueFromPrev);
             return next(valueFromPrev);
-        }
+        };
 
-        async function transform(context: MyContext, next: NextFunction, valueFromPrev: string) {
-            return valueFromPrev.toUpperCase();
-        }
+        const transform: Middleware<MyContext> = async (context, next, valueFromPrev) => valueFromPrev.toUpperCase();
 
-        async function fetch(context: MyContext, next: NextFunction) {
+        const fetch: Middleware<MyContext> = async (context, next) => {
             const rawData = await context.service.get();
-
             return next(rawData);
-        }
+        };
 
         const context: MyContext = {
             logger: { log: loggerMock },
@@ -63,23 +60,25 @@ describe('Examples', () => {
             person: string;
         };
 
-        async function ateCandies(context: MyContext, next: NextFunction, candies: any) {
-            return next(context.person + ' ate ' + candies.join(','));
-        }
+        const ateCandies: Middleware<MyContext> = async (
+            context: MyContext,
+            next: NextFunction,
+            valueFromPrev: any,
+        ) => {
+            return next(context.person + ' ate ' + valueFromPrev.join(','));
+        };
 
-        async function drankOrangeJuice(context: MyContext, next: NextFunction, valueFromPrev: any) {
+        const drankOrangeJuice: Middleware<MyContext> = async (
+            context: MyContext,
+            next: NextFunction,
+            valueFromPrev: any,
+        ) => {
             return next(valueFromPrev + ' and drank orange juice');
-        }
+        };
 
-        async function chocolate(context: MyContext, next: NextFunction, valueFromPrev: any) {
-            return 'chocolate';
-        }
-
-        async function jellyBean(context: MyContext, next: NextFunction, valueFromPrev: any) {
-            return 'jelly bean';
-        }
-
-        const getCandies = parallel([chocolate, jellyBean]);
+        const chocolate: Middleware<MyContext> = async () => 'chocolate';
+        const jellyBean: Middleware<MyContext> = async () => 'jelly bean';
+        const getCandies: Middleware<MyContext> = parallel([chocolate, jellyBean]);
 
         const result = await compose<MyContext>([getCandies, ateCandies, drankOrangeJuice])({ person: 'Tom' });
         expect(result).toEqual('Tom ate chocolate,jelly bean and drank orange juice');
