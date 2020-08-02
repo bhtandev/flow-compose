@@ -3,6 +3,7 @@
 [![NPM version][npm-image]][npm-url]
 [![License][license-image]][license-url]
 [![Downloads][downloads-image]][downloads-url]
+[![TypeScript][ts-image]][ts-url]
 
 Flow control for **any asynchronous functions** utilising a onion-like compose `middleware` returning a fully valid middleware 
 comprised of all those which are passed.
@@ -115,8 +116,10 @@ const result = await compose<MyContext>([getCandies, ateCandies, drankOrangeJuic
 ```
 
 [npm-image]: https://img.shields.io/npm/v/flow-compose.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/ctx-compose
+[npm-url]: https://npmjs.org/package/flow-compose
 [license-image]: http://img.shields.io/npm/l/flow-compose.svg?style=flat-square
 [license-url]: LICENSE
 [downloads-image]: http://img.shields.io/npm/dm/flow-compose.svg?style=flat-square
 [downloads-url]: https://npmjs.org/package/flow-compose
+[ts-image]: https://badges.frapsoft.com/typescript/code/typescript.svg?v=101
+[ts-url]: https://github.com/ellerbrock/typescript-badges/
