@@ -4,7 +4,7 @@
 [![License][license-image]][license-url]
 [![Downloads][downloads-image]][downloads-url]
 
-Flow control for **any asynchronous functions** utilising a onion-like compose `middleware` returning a fully valid middleware 
+Flow control for **any asynchronous function** utilising a onion-like compose `middleware` returning a fully valid middleware 
 comprised of all those which are passed.
 
 The flow acts in a stack-like manner, allowing consumer to perform actions downstream then after actions on the response upstream.
@@ -15,7 +15,7 @@ This is based on popular [koajs/koa-compose](https://github.com/koajs/compose) r
 
 `koa-compose` pattern is very powerful and in fact it can be used beyond Koa framework. ( the namespace, the context API ) 
 
-Ultimately this gives the consumer the ability to modularise different steps and in a process and control the flow.
+Ultimately this gives the consumer the ability to modularise different steps in a process and control the flow.
 
 ## Installation
 
