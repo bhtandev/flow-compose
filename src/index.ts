@@ -35,17 +35,19 @@ const compose = <T = any>(middlewares: Middleware<T>[]) => {
         const middlewareIncludingNext = next ? [...middlewares, next] : middlewares;
         const composed = middlewareIncludingNext.reduceRight(
             (next: NextFunction, currentMiddleware: Middleware) => {
-                const middleware = (context: T, nextFn: NextFunction) =>
-                    currentMiddleware(
-                        context,
-                        (prevValue) => {
-                            valueFromPrev = prevValue; // save for next
-                            return nextFn(prevValue);
-                        },
-                        valueFromPrev,
-                    );
-
-                return buildNextFunction(middleware, context, next);
+                return buildNextFunction(
+                    () =>
+                        currentMiddleware(
+                            context,
+                            (prevValue) => {
+                                valueFromPrev = prevValue; // save for next
+                                return next(prevValue);
+                            },
+                            valueFromPrev,
+                        ),
+                    context,
+                    next,
+                );
             },
             buildNextFunction(() => valueFromPrev, context, NOOP), // final run
         );

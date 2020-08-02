@@ -1,4 +1,4 @@
-import { compose, Middleware, NextFunction, parallel } from '../index';
+import { compose, Middleware, parallel } from '../index';
 
 describe('Examples', () => {
     it('as middleware', async () => {
@@ -60,19 +60,11 @@ describe('Examples', () => {
             person: string;
         };
 
-        const ateCandies: Middleware<MyContext> = async (
-            context: MyContext,
-            next: NextFunction,
-            valueFromPrev: any,
-        ) => {
+        const ateCandies: Middleware<MyContext> = async (context, next, valueFromPrev) => {
             return next(context.person + ' ate ' + valueFromPrev.join(','));
         };
 
-        const drankOrangeJuice: Middleware<MyContext> = async (
-            context: MyContext,
-            next: NextFunction,
-            valueFromPrev: any,
-        ) => {
+        const drankOrangeJuice: Middleware<MyContext> = async (context, next, valueFromPrev) => {
             return next(valueFromPrev + ' and drank orange juice');
         };
 

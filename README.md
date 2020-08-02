@@ -36,7 +36,7 @@ yarn add flow-compose
 
 ##### Middleware example: 
 ```typescript
-import { compose, NextFunction } from 'flow-compose';
+import { compose, Middleware } from 'flow-compose';
 
 type MyContext = {
     logger: { log: (...args: any[]) => void };
@@ -86,25 +86,17 @@ const result = await compose<MyContext>([handleError, logRunningTime, fetch, fir
 
 ##### Basic input/output pipeline example: 
 ```typescript
-import { compose, NextFunction } from 'flow-compose';
+import { compose, Middleware, parallel } from 'flow-compose';
 
 type MyContext = {
     person: string
 }
 
-const ateCandies: Middleware<MyContext> = async (
-    context: MyContext,
-    next: NextFunction,
-    valueFromPrev: any,
-) => {
+const ateCandies: Middleware<MyContext> = async (context, next, valueFromPrev) => {
     return next(context.person + ' ate ' + valueFromPrev.join(','));
 };
 
-const drankOrangeJuice: Middleware<MyContext> = async (
-    context: MyContext,
-    next: NextFunction,
-    valueFromPrev: any,
-) => {
+const drankOrangeJuice: Middleware<MyContext> = async (context, next, valueFromPrev) => {
     return next(valueFromPrev + ' and drank orange juice');
 };
 
