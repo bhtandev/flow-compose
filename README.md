@@ -4,18 +4,18 @@
 [![License][license-image]][license-url]
 [![Downloads][downloads-image]][downloads-url]
 
-Asynchronous flow control utilising a onion-like compose `middleware` returning a fully valid middleware 
+Flow control for **any asynchronous functions** utilising a onion-like compose `middleware` returning a fully valid middleware 
 comprised of all those which are passed.
 
-The idea of middleware is to create small handlers that each perform a specific task and pass the result to the next step in a chain. 
+The flow acts in a stack-like manner, allowing consumer to perform actions downstream then after actions on the response upstream.
 
-This pattern has been implemented already in KoaJS for processing HTTP requests and **does not have to be limited 
-to just HTTP request and response cycle but apply to any asynchronous functions**.
-
-This is a TypeScript port of [koajs/koa-compose](https://github.com/koajs/compose) with extra
-
+This is based on popular [koajs/koa-compose](https://github.com/koajs/compose) rewritten in Typescript using reduce with 
  - ability to specify own context type and 
- - optional passing of a value as parameter from previous middleware into the next
+ - optional passing of a value from previous middleware into the next as a parameter ( so that it can be used as a I/O pipeline )
+
+`koa-compose` pattern is very powerful and in fact it can be used beyond Koa framework. ( the namespace, the context API ) 
+
+Ultimately this gives the consumer the ability to modularise different steps and in a process and control the flow.
 
 ## Installation
 
@@ -28,8 +28,8 @@ yarn add flow-compose
 
 ## Usage
 
+As middleware: 
 ```typescript jsx
-// Module import
 import { compose, NextFunction } from 'flow-compose';
 
 type MyContext = {
@@ -40,7 +40,7 @@ type MyContext = {
 
 async function handleError(context: MyContext, next: NextFunction) {
     try {
-        return next();
+        return await next();
     } catch (err) {
         // handle error
         return null;
@@ -79,6 +79,35 @@ const context: MyContext = {
 };
 
 const result = await compose<MyContext>([handleError, logRunningTime, fetch, fireEvent, transform])(context);
+```
+
+As basic input/output pipeline: 
+```typescript jsx
+import { compose, NextFunction } from 'flow-compose';
+
+type MyContext = {
+    person: string
+}
+
+async function ateCandies(context: MyContext, next: NextFunction, candies: any) {
+    return next(context.person + ' ate ' + candies.join(','));
+}
+
+async function drankOrangeJuice(context: MyContext, next: NextFunction, valueFromPrev: any) {
+    return next(valueFromPrev + ' and drank orange juice')
+}
+
+async function chocolate(context:  MyContext, next: NextFunction, valueFromPrev: any) {
+    return 'chocolate'
+}
+
+async function jellyBean(context: MyContext, next: NextFunction, valueFromPrev: any) {
+    return 'jelly bean'
+}
+
+const getCandies = parallel([chocolate, jellyBean]);
+
+const result = await compose<MyContext>([getCandies, ateCandies, drankOrangeJuice])({ person: 'Tom' });
 ```
 
 [npm-image]: https://img.shields.io/npm/v/flow-compose.svg?style=flat-square

@@ -1,50 +1,62 @@
-type NextFunction = (previousResult?: any) => Promise<any>;
+type NextFunction = (valueFromPrev?: any) => Promise<any>;
 
-type Middleware<T = any> = (context: T, next: NextFunction, PreviousResult?: any) => Promise<any>;
+type Middleware<T = any> = (context: T, next: NextFunction, valueFromPrev?: any) => Promise<any>;
 
-const compose = <T = any>(middleware: Middleware<T>[]) => {
-    if (!Array.isArray(middleware)) {
+const buildNextFunction = <T>(middleware: Middleware<T>, context: T, next: NextFunction) => {
+    let called = false;
+    return async () => {
+        if (called) {
+            throw new Error('next() called multiple times');
+        }
+        called = true;
+        try {
+            return await middleware(context, next);
+        } catch (e) {
+            throw e;
+        }
+    };
+};
+
+const NOOP = async () => undefined;
+
+const compose = <T = any>(middlewares: Middleware<T>[]) => {
+    if (!Array.isArray(middlewares)) {
         throw new TypeError('Middleware stack must be an array!');
     }
 
-    for (const fn of middleware) {
+    for (const fn of middlewares) {
         if (typeof fn !== 'function') {
             throw new TypeError('Middleware must be composed of functions!');
         }
     }
 
-    return function (context: T, next?: NextFunction, previousResult?: any): Promise<any> {
-        // last called middleware #
-        let index = -1;
+    return async (context: T, next?: NextFunction, initialValue?: any): Promise<any> => {
+        let valueFromPrev = initialValue;
+        const middlewareIncludingNext = next ? [...middlewares, next] : middlewares;
+        const composed = middlewareIncludingNext.reduceRight(
+            (next: NextFunction, currentMiddleware: Middleware) => {
+                const middleware = (context: T, nextFn: NextFunction) =>
+                    currentMiddleware(
+                        context,
+                        (prevValue) => {
+                            valueFromPrev = prevValue; // save for next
+                            return nextFn(prevValue);
+                        },
+                        valueFromPrev,
+                    );
 
-        return dispatch(0, previousResult);
+                return buildNextFunction(middleware, context, next);
+            },
+            buildNextFunction(() => valueFromPrev, context, NOOP), // final run
+        );
 
-        async function dispatch(i: number, previousResult: any): Promise<any> {
-            if (i <= index) {
-                throw new Error('next() called multiple times');
-            }
-
-            index = i;
-
-            let fn: Middleware | NextFunction | undefined = middleware[i];
-
-            if (i === middleware.length) {
-                fn = next;
-            }
-
-            if (!fn) {
-                return previousResult;
-            }
-
-            return fn(
-                context,
-                (previousResult: any): Promise<any> => {
-                    return dispatch(i + 1, previousResult);
-                },
-                previousResult,
-            );
-        }
+        return composed();
     };
 };
 
-export { compose, Middleware, NextFunction };
+const parallel = <T>(middleware: Middleware[]) => async (context: T, next: NextFunction, prev?: any) => {
+    const result = await Promise.all(middleware.map((m) => m(context, NOOP, prev)));
+    return next(result);
+};
+
+export { compose, parallel, Middleware, NextFunction };
