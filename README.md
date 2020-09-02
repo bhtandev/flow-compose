@@ -5,7 +5,7 @@
 [![Downloads][downloads-image]][downloads-url]
 [![TypeScript][ts-image]][ts-url]
 
-Flow control for **any asynchronous functions** utilising a onion-like compose `middleware` returning a fully valid middleware 
+Flow control for **any asynchronous function** utilising a onion-like compose `middleware` returning a fully valid middleware 
 comprised of all those which are passed.
 
 The flow acts in a stack-like manner, allowing consumer to perform actions downstream then after actions on the response upstream.

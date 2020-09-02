@@ -30,7 +30,7 @@ const compose = <T = any>(middlewares: Middleware<T>[]) => {
         }
     }
 
-    return async (context: T, next?: NextFunction, initialValue?: any): Promise<any> => {
+    return async (context: T, next?: Middleware, initialValue?: any): Promise<any> => {
         let valueFromPrev = initialValue;
         const middlewareIncludingNext = next ? [...middlewares, next] : middlewares;
         const composed = middlewareIncludingNext.reduceRight(
