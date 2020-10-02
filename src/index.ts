@@ -30,14 +30,14 @@ const compose = <T = any>(middlewares: Middleware<T>[]) => {
         }
     }
 
-    return async (context: T, next?: Middleware, initialValue?: any): Promise<any> => {
+    return async (context: T, nextMw?: Middleware, initialValue?: any): Promise<any> => {
         let valueFromPrev = initialValue;
-        const middlewareIncludingNext = next ? [...middlewares, next] : middlewares;
-        const composed = middlewareIncludingNext.reduceRight(
-            (next: NextFunction, currentMiddleware: Middleware) => {
+        const middlewaresIncludingNextMw = nextMw ? [...middlewares, nextMw] : middlewares;
+        const composed = middlewaresIncludingNextMw.reduceRight(
+            (next: NextFunction, currentMw: Middleware) => {
                 return buildNextFunction(
                     () =>
-                        currentMiddleware(
+                        currentMw(
                             context,
                             (prevValue) => {
                                 valueFromPrev = prevValue; // save for next
@@ -49,7 +49,7 @@ const compose = <T = any>(middlewares: Middleware<T>[]) => {
                     next,
                 );
             },
-            buildNextFunction(() => valueFromPrev, context, NOOP), // final run
+            buildNextFunction(() => valueFromPrev, context, NOOP), // last async next()
         );
 
         return composed();
