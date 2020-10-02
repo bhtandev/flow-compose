@@ -34,8 +34,8 @@ const compose = <T = any>(middlewares: Middleware<T>[]) => {
         let valueFromPrev = initialValue;
         const middlewaresIncludingNextMw = nextMw ? [...middlewares, nextMw] : middlewares;
         const composed = middlewaresIncludingNextMw.reduceRight(
-            (next: NextFunction, currentMw: Middleware) => {
-                return buildNextFunction(
+            (next: NextFunction, currentMw: Middleware) =>
+                buildNextFunction(
                     () =>
                         currentMw(
                             context,
@@ -47,8 +47,7 @@ const compose = <T = any>(middlewares: Middleware<T>[]) => {
                         ),
                     context,
                     next,
-                );
-            },
+                ),
             buildNextFunction(() => valueFromPrev, context, NOOP), // last async next()
         );
 
